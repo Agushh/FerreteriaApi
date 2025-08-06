@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: ferreteria-api
+    env: docker
+    plan: free
+    dockerfilePath: FerreteriaApi/Dockerfile
+    buildContext: FerreteriaApi
+    envVars:
+      - key: PORT
+        value: 8080
