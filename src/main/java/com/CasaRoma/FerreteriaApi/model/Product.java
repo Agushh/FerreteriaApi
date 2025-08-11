@@ -1,6 +1,5 @@
 package com.CasaRoma.FerreteriaApi.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 @Entity
@@ -27,12 +26,15 @@ public class Product {
     @ManyToOne
     private Distributor distributor;
 
+
+    //dudoso todo revisar si realmente se necesita
+    @Transient
+    private Integer idOfDistributor;
+
     public Integer getIdOfDistributor() {
         return idOfDistributor;
     }
 
-    @Transient
-    private Integer idOfDistributor;
 
     public Product() {
     }
@@ -92,5 +94,13 @@ public class Product {
 
     public void setDistributor(Distributor distributor) {
         this.distributor = distributor;
+    }
+
+    @Override
+    public String toString() {
+        return "Product{" +
+                "id=" + id +
+                ", nombre='" + nombre + '\'' +
+                '}';
     }
 }

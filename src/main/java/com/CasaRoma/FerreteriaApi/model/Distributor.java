@@ -49,4 +49,12 @@ public class Distributor {
     public void setAumento(float aumento) {
         this.aumento = aumento;
     }
+
+    @Override
+    public String toString() {
+        return "Distributor{" +
+                "name='" + name + '\'' +
+                ", id=" + id +
+                '}';
+    }
 }

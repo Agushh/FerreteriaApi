@@ -17,6 +17,6 @@ public class DataLoader implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
-        System.out.println(userService.registerMain().getUsername());
+        userService.registerMain();
     }
 }

@@ -1,5 +1,6 @@
 package com.CasaRoma.FerreteriaApi.service;
 
+import com.CasaRoma.FerreteriaApi.exception.ResourceNotFoundException;
 import com.CasaRoma.FerreteriaApi.model.Distributor;
 import com.CasaRoma.FerreteriaApi.repository.DistributorRepo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,30 +14,25 @@ public class DistributorService {
     @Autowired
     DistributorRepo distributorRepo;
 
-
     public List<Distributor> getAllDistributors()
     {
         return distributorRepo.findAll();
     }
 
-    public Distributor getDistributor(int id)
-    {
-        return distributorRepo.findById(id).orElse(new Distributor());
+    public Distributor getDistributor(int id) {
+        return distributorRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException("Distribuidor ID{" + id + "} No Encontrado"));
     }
 
-    public void updateDistributor(Distributor distributor)
-    {
-        Distributor dis = distributorRepo.findById(distributor.getId()).orElseThrow(() -> new RuntimeException("No encontrado"));
-        distributorRepo.save(distributor);
+    public Distributor updateDistributor(Distributor distributor) {
+        distributorRepo.findById(distributor.getId()).orElseThrow(() -> new ResourceNotFoundException(distributor + " No Encontrado."));
+        return distributorRepo.save(distributor);
     }
 
-    public void createDistributor(Distributor distributor)
-    {
-        distributorRepo.save(distributor);
+    public Distributor createDistributor(Distributor distributor) {
+        return distributorRepo.save(distributor);
     }
 
-    public void deleteDistributor(int id)
-    {
+    public void deleteDistributor(int id) {
         distributorRepo.deleteById(id);
     }
 

@@ -32,6 +32,8 @@ public class UserPrincipal implements UserDetails {
         return user.getUsername();
     }
 
+
+    //todo implementar metodos de comprobacion de estado de cuenta
     @Override
     public boolean isAccountNonExpired() {
         return true;

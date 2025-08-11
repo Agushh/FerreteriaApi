@@ -1,5 +1,6 @@
 package com.CasaRoma.FerreteriaApi.service;
 
+import com.CasaRoma.FerreteriaApi.exception.ResourceNotFoundException;
 import com.CasaRoma.FerreteriaApi.model.Distributor;
 import com.CasaRoma.FerreteriaApi.model.Product;
 import com.CasaRoma.FerreteriaApi.model.ProductDTO;
@@ -23,26 +24,23 @@ public class ProductService {
     private ProductRepo productRepo;
 
     @Autowired
-    DistributorRepo distributorRepo;
+    private DistributorRepo distributorRepo;
 
-    public void addProduct(Product product)
+    public Product addProduct(Product product)
     {
         Product pr = validateProduct(product);
-        System.out.println(pr.getId());
-        pr.setId(null);
-        productRepo.save(pr);
+        return productRepo.save(pr);
     }
 
     public void addProducts(List<Product> products) {
         productRepo.saveAll(products.stream().map(this::validateProduct).toList());
     }
 
-    public Page<ProductDTO> getByQuery(String query, int pagina, int tamanio, String ordenarPor) {
-        Pageable pageable = PageRequest.of(pagina, tamanio, Sort.by(ordenarPor).ascending());
+    public Page<ProductDTO> getByQuery(String query, int pagina, int size, String ordenarPor) {
+        Pageable pageable = PageRequest.of(pagina, size, Sort.by(ordenarPor).ascending());
         Specification<Product> spec = ProductSpecification.buscarPorQuery(query);
         return productRepo.findAll(spec, pageable).map(this::productToDto);
     }
-
 
     public List<ProductDTO> getProducts()
     {
@@ -51,7 +49,7 @@ public class ProductService {
 
     public ProductDTO getProductByID(int id)
     {
-        return productToDto(productRepo.findById(id).orElse(new Product()));
+        return productToDto(productRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException("Producto ID{" + id + "} No encontrado")));
     }
 
     public void deleteProduct(int id)
@@ -61,13 +59,13 @@ public class ProductService {
 
     @Transactional
     public void deleteByDistributorID(int distId) {
-        productRepo.deleteByDistributor(distributorRepo.findById(distId).orElseThrow(() -> new RuntimeException("Distribuidor no encontrado")));
+        productRepo.deleteByDistributor(distributorRepo.findById(distId).orElseThrow(() -> new ResourceNotFoundException("Distribuidor No Encontrado")));
     }
 
-    public void updateProduct(Product product)
+    public Product updateProduct(Product product)
     {
-        Product pr = productRepo.findById(product.getId()).orElseThrow(() -> new RuntimeException("No encontrado."));
-        productRepo.save(validateProduct(product));
+        Product pr = productRepo.findById(product.getId()).orElseThrow(() -> new ResourceNotFoundException(product + "\n No Encontrado"));
+        return productRepo.save(validateProduct(product));
     }
 
     private ProductDTO productToDto(Product product)
@@ -77,13 +75,12 @@ public class ProductService {
 
     private Product validateProduct(Product product)
     {
-        product.setId(product.getId() != null ? product.getId() : 0);
-        product.setCategoria(product.getCategoria() != null ? product.getCategoria() : "");
-        product.setNombre(product.getNombre() != null ? product.getNombre() : "");
-        product.setDistributor(product.getDistributor() != null ? product.getDistributor() : distributorRepo.findById(product.getIdOfDistributor()).orElse(null));
+        product.setId(product.getId() != null ? product.getId() : null);
+        product.setCategoria(product.getCategoria() != null ? product.getCategoria() : "Sin Categoria");
+        product.setNombre(product.getNombre() != null ? product.getNombre() : "Sin Nombre");
+        product.setDistributor(product.getDistributor() != null ? product.getDistributor() : distributorRepo.findById(product.getIdOfDistributor()).orElse(distributorRepo.findAll().getFirst()));
         product.setPrecioLista(product.getPrecioLista() != 0 ? product.getPrecioLista() : 0);
         product.setIdFromDistributor(product.getIdFromDistributor() != null ? product.getIdFromDistributor() : "");
         return product;
     }
-
 }

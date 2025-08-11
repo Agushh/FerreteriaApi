@@ -9,7 +9,6 @@ public class ProductDTO {
     final float precioLista;
     final float precioFinal;
 
-
     public ProductDTO(int id, String idFromTheDistributor, int idOfTheDistributor, String nombre, String categoria, float precioLista, float aumento)
     {
         this.id = id;

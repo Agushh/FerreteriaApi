@@ -8,10 +8,13 @@ import com.CasaRoma.FerreteriaApi.service.ExcelService;
 import com.CasaRoma.FerreteriaApi.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.net.URI;
 import java.util.List;
 
 @RestController
@@ -19,94 +22,108 @@ import java.util.List;
 public class MainController {
 
     @Autowired
-    ProductService productService;
+    private ProductService productService;
 
     @Autowired
-    DistributorService distributorService;
+    private DistributorService distributorService;
 
     @Autowired
-    ExcelService excelService;
+    private ExcelService excelService;
 
 
     @GetMapping("/productos")
-    public List<ProductDTO> getProducts()
+    public ResponseEntity<List<ProductDTO>> getProducts()
     {
-        return productService.getProducts();
+        List<ProductDTO> body = productService.getProducts();
+        return ResponseEntity.ok(body);
     }
 
     @GetMapping("/productos/{id}")
-    public ProductDTO getProductById(@PathVariable int id)
+    public ResponseEntity<ProductDTO> getProductById(@PathVariable int id)
     {
-        return productService.getProductByID(id);
+        ProductDTO body = productService.getProductByID(id);
+        return ResponseEntity.ok(body);
     }
 
     @GetMapping("/getProductosByQuery")
-    public Page<ProductDTO> search(
+    public ResponseEntity<Page<ProductDTO>> search(
             @RequestParam(required = false) String query,
             @RequestParam(defaultValue = "0") int pagina,
             @RequestParam(defaultValue = "20") int size,
             @RequestParam(defaultValue = "nombre") String ordenarPor
     ) {
-        return productService.getByQuery(query, pagina, size, ordenarPor);
+        return ResponseEntity.ok(productService.getByQuery(query, pagina, size, ordenarPor));
     }
+
 
     @PostMapping("/productos")
-    public void addProduct(@RequestBody Product productDTO)
+    public ResponseEntity<Product> addProduct(@RequestBody Product productDTO)
     {
-        productService.addProduct(productDTO);
+        Product created = productService.addProduct(productDTO);
+        URI location = URI.create("/productos/" + created.getId());
+        return ResponseEntity.created(location).body(created);
     }
 
-    @PostMapping("/sendProductos")
-    public void addProducts(@RequestBody List<Product> productDTOList)
+    @PostMapping("/productos/sendAll")
+    public ResponseEntity<String> addProducts(@RequestBody List<Product> productDTOList)
     {
         productService.addProducts(productDTOList);
+        return ResponseEntity.ok("Productos cargados con exito");
     }
 
     @DeleteMapping("/productos/{id}")
-    public void deleteProduct(@PathVariable int id)
+    public ResponseEntity<Void> deleteProduct(@PathVariable int id)
     {
         productService.deleteProduct(id);
+        return ResponseEntity.noContent().build();
     }
-    @DeleteMapping("/productos/deleteByDist/{distId}")
-    public void deleteByDistributorID(@PathVariable int distId)
+
+    private void deleteByDistributorID(@PathVariable int distId)
     {
         productService.deleteByDistributorID(distId);
     }
 
     @PutMapping("/productos")
-    public void updateProduct(@RequestBody Product product)
+    public ResponseEntity<Product> updateProduct(@RequestBody Product product)
     {
-        productService.updateProduct(product);
+        Product body = productService.updateProduct(product);
+        return ResponseEntity.ok(body);
     }
 
     @GetMapping("/distribuidores")
-    public List<Distributor> getAllDistributors()
+    public ResponseEntity<List<Distributor>> getAllDistributors()
     {
-        return distributorService.getAllDistributors();
+        List<Distributor> distributors = distributorService.getAllDistributors();
+        return ResponseEntity.ok(distributors);
     }
 
     @GetMapping("/distribuidores/{id}")
-    public Distributor getDistributorById(@PathVariable int id)
+    public ResponseEntity<Distributor> getDistributorById(@PathVariable int id)
     {
-        return distributorService.getDistributor(id);
+        Distributor distributor = distributorService.getDistributor(id);
+        return ResponseEntity.ok(distributor);
     }
 
     @PostMapping("/distribuidores")
-    public void createDistributor(@RequestBody Distributor distributorDTO)
+    public ResponseEntity<Distributor> createDistributor(@RequestBody Distributor distributorDTO)
     {
-        distributorService.createDistributor(distributorDTO);
+        Distributor distributor = distributorService.createDistributor(distributorDTO);
+        URI location = URI.create("/distribuidores/" + distributor.getId());
+        return ResponseEntity.created(location).body(distributor);
     }
 
     @PutMapping("/distribuidores")
-    public void updateDistributor(@RequestBody Distributor distributor)
+    public ResponseEntity<Distributor> updateDistributor(@RequestBody Distributor distributor)
     {
-        distributorService.updateDistributor(distributor);
+        Distributor body = distributorService.updateDistributor(distributor);
+        return ResponseEntity.ok(body);
     }
 
     @DeleteMapping("/distribuidores/{id}")
-    public void deleteDistributor(@PathVariable int id)
+    public ResponseEntity<Void> deleteDistributor(@PathVariable int id)
     {
         distributorService.deleteDistributor(id);
+        return ResponseEntity.noContent().build();
     }
 
     @PostMapping("/excel/upload")
@@ -120,7 +137,6 @@ public class MainController {
         deleteByDistributorID(distribuidorId);
 
         String retorno = excelService.deserialize(file, distribuidorId);
-
 
         return ResponseEntity.ok(retorno);
     }

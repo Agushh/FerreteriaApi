@@ -9,8 +9,8 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
-                .allowedOrigins("http://mipagina.com")
+                .allowedOrigins("https://casaromaapp.onrender.com")
                 .allowedMethods("GET", "POST", "PUT", "DELETE")
-                .allowCredentials(true); // si usas cookies o JWT en headers
+                .allowCredentials(true);
     }
 }

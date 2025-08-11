@@ -1,5 +1,6 @@
 package com.CasaRoma.FerreteriaApi.service;
 
+import com.CasaRoma.FerreteriaApi.exception.ResourceNotFoundException;
 import com.CasaRoma.FerreteriaApi.model.Distributor;
 import com.CasaRoma.FerreteriaApi.model.Product;
 import com.CasaRoma.FerreteriaApi.repository.DistributorRepo;
@@ -30,7 +31,7 @@ public class ExcelService {
 
     public String deserialize(MultipartFile file, Integer distributorID) {
 
-        Distributor distributor = distributorRepo.findById(distributorID).orElseThrow(() -> new RuntimeException("Distribuidor no encontrado."));
+        Distributor distributor = distributorRepo.findById(distributorID).orElseThrow(() -> new ResourceNotFoundException("Distribuidor no encontrado."));
 
         try (InputStream inputStream = file.getInputStream()) {
             Workbook workbook = new XSSFWorkbook(inputStream);
@@ -49,9 +50,8 @@ public class ExcelService {
                     float precioLista = 0;
 
                     switch (distributor.getName().toLowerCase()) {
-                        case "iturria":
-                            //
-                            //
+                        case "sg electricidad":
+
                             break;
 
                         case "poxipol":
@@ -82,7 +82,7 @@ public class ExcelService {
                         case "atlantica":
                             if(ConstantCategory != null && ConstantCategory.isEmpty()) ConstantCategory = getSafeStringCell(row, 0) != null ? getSafeStringCell(row, 0) : "";
                             else if(row.getCell(1) == null) SecondCategory = getSafeStringCell(row, 0) != null ? getSafeStringCell(row, 0) : "";
-                            if(row.getRowNum() <= 3 || getSafeStringCell(row, 1) != null && getSafeStringCell(row, 1).equals("Registro/s") ) {
+                            if(row.getRowNum() <= 3 || getSafeStringCell(row, 1) != null && Objects.equals(getSafeStringCell(row, 1), "Registro/s")) {
                                 ConstantCategory = "";
                                 continue;
                             }
@@ -107,7 +107,7 @@ public class ExcelService {
                         productRepo.save(new Product(null, idFromDistributor, nombre, categoria != null ? categoria : "", precioLista, distributor));
                     }
                 } catch (RuntimeException e) {
-                    throw new RuntimeException("error procesando la fila : " + row.getRowNum());
+                    throw new RuntimeException("error procesando la fila : " + row.getRowNum() + "se detuvo el proceso.");
                 }
             }
             return "Archivo procesado exitosamente";
@@ -120,9 +120,8 @@ public class ExcelService {
             if (row.getCell(index) == null) return null;
 
             return switch (row.getCell(index).getCellType()) {
-                case STRING -> row.getCell(index).getStringCellValue().trim();
+                case STRING, FORMULA -> row.getCell(index).getStringCellValue().trim();
                 case NUMERIC -> String.valueOf((int) row.getCell(index).getNumericCellValue());
-                case FORMULA -> row.getCell(index).getStringCellValue().trim(); // o evaluarla
                 default -> null;
             };
         } catch (Exception e) {
@@ -135,20 +134,17 @@ public class ExcelService {
             if (row.getCell(index) == null) return 0;
 
             return switch (row.getCell(index).getCellType()) {
-                case NUMERIC -> (float) row.getCell(index).getNumericCellValue();
+                case NUMERIC, FORMULA -> (float) row.getCell(index).getNumericCellValue();
                 case STRING ->
                         {
                             String raw = row.getCell(index).getStringCellValue().trim();
-                            NumberFormat format = NumberFormat.getInstance(new Locale("es", "AR"));
+                            NumberFormat format = NumberFormat.getInstance(new Locale("es", "AR")); //todo Actualizar metodo deprecated
                             Number number = format.parse(raw);
                             yield number.floatValue();
                         }
-                case FORMULA -> (float) row.getCell(index).getNumericCellValue(); // o evaluarla
                 default -> 0;
             };
-        }catch (ParseException e){
-            return 0;
-        }catch (Exception e) {
+        } catch (Exception e) {
             return 0;
         }
     }

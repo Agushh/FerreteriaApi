@@ -26,6 +26,7 @@ public class JwtFilter extends OncePerRequestFilter {
     @Autowired
     private ApplicationContext applicationContext;
 
+    //todo verificar estos warnings
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 

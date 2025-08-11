@@ -10,6 +10,7 @@ import java.util.List;
 
 public class ProductSpecification {
 
+    //todo eliminar lo de distribuidor ID porque nunca se va a usar esa busqueda. Añadir filtros de orden.
     public static Specification<Product> buscarPorQuery(String query) {
         return (root, cq, cb) -> {
             if (query == null || query.trim().isEmpty()) {

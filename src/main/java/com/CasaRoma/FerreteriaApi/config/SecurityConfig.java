@@ -31,6 +31,8 @@ public class SecurityConfig {
     @Autowired
     private JwtFilter jwtFilter;
 
+
+    //todo modernizar el tema de las url y tenerlo mejor montado. Añadir filtros administrador y usuario si llega a ser necesario.
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
 
