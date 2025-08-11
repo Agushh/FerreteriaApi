@@ -39,6 +39,22 @@ public class ProductSpecification {
                 predicadosFinales.add(predicadoPorPalabra);
             }
 
+            // Aquí agregamos el ordenamiento
+
+            // Vamos a priorizar solo el campo "nombre" para empezar con la palabra
+            // Solo con la primer palabra de la query para simplificar (o iterar si querés)
+
+            String primeraPalabra = palabras[0];
+
+            // CASE WHEN lower(nombre) LIKE 'primeraPalabra%' THEN 0 ELSE 1 END
+            var caseOrder = cb.selectCase()
+                    .when(cb.like(cb.lower(root.get("nombre")), primeraPalabra + "%"), 0)
+                    .otherwise(1);
+
+            // Aplicar el order by al CriteriaQuery
+            assert cq != null;
+            cq.orderBy(cb.asc(caseOrder), cb.asc(root.get("nombre")));
+
             return cb.and(predicadosFinales.toArray(new Predicate[0]));
         };
     }
