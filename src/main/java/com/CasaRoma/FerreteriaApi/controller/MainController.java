@@ -141,8 +141,9 @@ public class MainController {
         return ResponseEntity.ok(retorno);
     }
 
-    @RequestMapping("/health")
-    public ResponseEntity<String> healthCheck() {
-        return ResponseEntity.ok("OK");
+    @RequestMapping(value = "/health", method = RequestMethod.HEAD)
+    public ResponseEntity<Void> healthCheck() {
+        // Responder con 200 OK y sin cuerpo
+        return ResponseEntity.ok().build();
     }
 }
