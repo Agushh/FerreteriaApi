@@ -89,7 +89,7 @@ public class ExcelService {
                             if(getSafeNumericCell(row, 2) == 0) continue;
                             idFromDistributor = getSafeStringCell(row, 0);
                             nombre = getSafeStringCell(row, 1);
-                            precioLista = getSafeNumericCell(row, 2);
+                            precioLista = getSafeNumericCell(row, 3);
                             categoria = ConstantCategory + " " + SecondCategory;
                             break;
 
