@@ -1,5 +1,6 @@
 package com.CasaRoma.FerreteriaApi.controller;
 
+import com.CasaRoma.FerreteriaApi.model.JwtTokenResponse;
 import com.CasaRoma.FerreteriaApi.model.User;
 import com.CasaRoma.FerreteriaApi.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,11 +15,11 @@ public class LoginController {
     private UserService userService;
 
     @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestBody User user)
+    public ResponseEntity<JwtTokenResponse> login(@RequestBody User user)
     {
         //System.out.println(user.getUsername() + "LoggedIn");
-        String jwtTokenResponse = userService.verify(user);
-        return ResponseEntity.ok(jwtTokenResponse);
+        JwtTokenResponse response = new JwtTokenResponse(userService.verify(user));
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/register")
