@@ -110,6 +110,5 @@ public class Product {
         nombre = "";
         categoria = "";
         precioLista = 0;
-        distributor = null;
     }
 }
