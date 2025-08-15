@@ -44,6 +44,8 @@ public class ExcelService {
 
             for (Row row : sheet) {
                 try {
+                    
+                    localProduct.clear();
 
                     if (row.getRowNum() == 0) continue;
 
@@ -111,7 +113,7 @@ public class ExcelService {
                         groupindex += 1;
 
                         productsBuffer.add(localProduct);
-                        localProduct.clear();
+                        localProduct = new Product();
                     }
                     if(groupindex == 50)
                     {
