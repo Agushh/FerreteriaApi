@@ -44,7 +44,7 @@ public class ExcelService {
 
             for (Row row : sheet) {
                 try {
-                    
+
                     localProduct.clear();
 
                     if (row.getRowNum() == 0) continue;
@@ -114,6 +114,7 @@ public class ExcelService {
 
                         productsBuffer.add(localProduct);
                         localProduct = new Product();
+                        localProduct.setDistributor(distributorRepo.findById(distributorID).orElseThrow(() -> new ResourceNotFoundException("Distribuidor no encontrado.")));
                     }
                     if(groupindex == 50)
                     {
@@ -126,6 +127,9 @@ public class ExcelService {
                 } catch (RuntimeException e) {
                     throw new RuntimeException("error procesando la fila : " + row.getRowNum() + "se detuvo el proceso.");
                 }
+            }
+            if (!productsBuffer.isEmpty()) {
+                productRepo.saveAll(productsBuffer);
             }
             return "Archivo procesado exitosamente";
         } catch (Exception e) {
