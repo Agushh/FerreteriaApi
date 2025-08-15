@@ -103,4 +103,13 @@ public class Product {
                 ", nombre='" + nombre + '\'' +
                 '}';
     }
+
+    public void clear() {
+        id = null;
+        idFromDistributor = "";
+        nombre = "";
+        categoria = "";
+        precioLista = 0;
+        distributor = null;
+    }
 }
